@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% set active_page = active_page|default('history') -%}
+{% block title %}History{% endblock %}
+{% block content %}
+<div class="container bg-light my-4">
+  <div id="charts" class="row">
+    <div id="chartContainer" class="mx-auto my-3" style="height: 5cm; width: 70%;"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <script src={{ url_for('static', filename="js/draw_chart.js") }}></script>
+{% endblock %}

@@ -1,0 +1,9 @@
+I use a virtualenv, use it too if you want. I added some common venv directories
+to the gitignore, so name it one of those or add your own's name to the file.
+
+install the dependencies from requirements.txt (this is subject to change, so
+do this after pulling too)
+
+Once you have Flask, etc, in the command line run:
+  export FLASK_APP=app/app.py
+  flask run

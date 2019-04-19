@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  {% block head %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block title %}{% endblock %} - Home IoT</title>
+  <link rel="shortcut icon" href={{ url_for('static', filename="ico/favicon.ico") }}>
+  <script src={{ url_for('static', filename="js/jquery.min.js") }} async></script>
+  <script src={{ url_for('static', filename="js/bootstrap.bundle.min.js") }} async></script>
+  <link rel="stylesheet" href={{ url_for('static', filename="css/bootstrap.min.css") }}>
+  <link rel="stylesheet" href={{ url_for('static', filename="css/font-awesome.min.css") }}>
+  <link rel="stylesheet" href={{ url_for('static', filename="css/style.css") }}>
+  {% endblock %}
+</head>
+<body class="background-image">
+  <div id="header">
+    <nav class="navbar fixed-top navbar-expand-sm navbar-light bg-light">
+      <div class="container">
+        <div class="navbar-brand">{{ translation["Home"] }} IoT</div>
+        {% set navigation_bar = [
+            ('/', 'home', 'HOME'),
+            ('/history', 'history', 'HISTORY'),
+            ('/admin', 'admin', 'ADMIN'),
+        ] -%}
+        <ul class="navbar-nav">
+        {% for href, id, caption in navigation_bar %}
+          <li class="nav-item{% if id == active_page %} active{% endif %}">
+            <a class="nav-link" href="{{ href|e }}">{{ translation[caption|e] }}</a>
+          </li>
+        {% endfor %}
+          <li>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="lang-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ lang }}
+              </button>
+              <div class="dropdown-menu" aria-labelledby="lang-button">
+              {% for code in langs %}
+                <a class="dropdown-item" href="#" name="{{ code|e }}">{{ code|e }}</a>
+              {% endfor %}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
+  <div id="scripts">
+    {% block scripts %}
+    <script>
+    $(document).ready(() => {
+      $('.dropdown-menu a').click(function() {
+        console.log($(this).attr('name'));
+        $.ajax({
+          type    : 'POST',
+          url     : '/change-locale',
+          data    : { 'language_code': $(this).attr('name') },
+          success : () => { location.reload(); },
+        });
+      });
+    });
+    </script>
+    {% endblock %}
+  </div>
+</body>
+</html>

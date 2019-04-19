@@ -1,0 +1,7 @@
+psql:
+  username: fmarashiweb
+  password: cs499group6
+  #host: cisdb.cis.uab.edu
+  host: 127.0.0.1
+  port: 5432
+  database: fmarashi

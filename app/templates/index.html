@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% set active_page = active_page|default('home') -%}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+{% endblock %}
+{% block title %}{{ translation["Home"] }}{% endblock %}
+{% block content %}
+<div class="container bg-light my-4 px-0">
+  <header id="main-header">
+    <div class="p-4" style="text-align:center">
+      {{translation["Welcome"]}}
+      {{translation["To"]}}
+      {{translation["Home"]}}
+      {{translation["Management"]}}
+      {{translation["System"]}}
+    </div>
+
+    <div class="w-1000"></div>
+
+    <div id='thermostat'></div>
+
+    <div class="city-container">
+      <div class="city-weather-temperature loader">
+        <span class="celsius fahrenheit-btn"></span>
+        <span class="fahrenheit celsius-btn"></span>
+      </div>
+      <div class="date">
+      </div>
+      <div class="city-weather-description">
+        <span id="description"></span>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap">
+      {% for room in rooms %}
+      <div class="col port-item p-4 bg-primary " data-toggle="collapse" data-target="#{{ room["target_id"] }}">
+        <i class="fas {{ room["icon"] }} d-block icon"></i>
+        <p class="icon-label">{{ translation[room["name"]] }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </header>
+
+  {% for room in rooms %}
+  <div id="{{ room["target_id"] }}" class="collapse">
+    <div class="card card-block card-primary p-3">
+      <h2> {{translation[room["name"]]}} {{translation["Objects"]}} </h2>
+    </div>
+    <div class="card card-block py-2 px-3">
+    {% for device in devices %}
+      {% if device["location"] == room["name"] %}
+      <div class="row px-2">
+        <h4 class="col device-header">
+        {% for word in device["name"].split() %}
+          {% if translation[word] %} {{ translation[word] }} {% else %} {{ word }} {% endif %}
+        {% endfor %}
+        </h4>
+        {% set status = get_device_status(device["uuid"]) %}
+        {% if status|length > 0 and "ON" in status[0]["event"] %}
+        <div class="btn col-7-lg btn-success">{{ status[0]["event"] }}</div>
+        {% else %}
+        <div class="btn col-7-lg btn-secondary">OFF</div>
+        {% endif %}
+      </div>
+      <p class="usage mx-1">
+        {% set cost = get_running_cost(device["uuid"],
+                                       device["device_type"],
+                                       device["power_usage"])
+        %}
+        {{ translation["Power"] }} {{ translation["Cost"] }}: ${{ "%.2f"|format(cost["power_cost"]) }}
+        <br>
+        {{ translation["Power"] }} {{ translation["Usage"] }}: {{ "%.2f"|format(cost["power"]) }} kWh
+        {% if cost["water"] != 0 %}
+        <br>
+        {{ translation["Water"] }} {{ translation["Usage"] }}: {{ "%.2f"|format(cost["water"]) }} Gal
+        {% endif %}
+      </p>
+      <br>
+      {% endif %}
+    {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+  $('.port-item').click(function(){
+    $('.collapse').collapse('hide');
+  });
+</script>
+<script src={{ url_for('static', filename="js/thermo.js") }} async></script>
+<script src={{ url_for('static', filename="js/weatherAPI.js") }} async></script>
+{% endblock %}
